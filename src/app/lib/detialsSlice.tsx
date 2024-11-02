@@ -16,7 +16,7 @@ export const detialsFilm = createAsyncThunk<
   { id: number } // نوع المعاملات التي تأخذها الدالة
 >("movies/detialsFilm", async ({ id }) => {
   const response = await axios.get(
-    `https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&append_to_response=credits`
+    `https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&append_to_response=videos,credits`
   );
   return response.data; // إرجاع البيانات الكاملة
 });
