@@ -5,3 +5,10 @@
 body {
   background-color: #1a1a1a;
 }
+
+.active {
+  font-weight: bold; /* جعل النص عريضًا */
+  color: #FFD700; /* تغيير لون النص إلى اللون الذهبي */
+  text-decoration: underline; /* إضافة خط تحت النص */
+  text-underline-offset: 4px; /* تعيين المسافة بين النص والخط السفلي */
+}
