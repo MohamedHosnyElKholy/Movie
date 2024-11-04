@@ -1,10 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Label, TextInput, Button } from "flowbite-react";
+import { Label, TextInput, Pagination } from "flowbite-react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/app/lib/store";
 import { fetchAllMovie } from "@/app/lib/allMovie";
-import Image from "next/image"; // استيراد مكون Image
+import Image from "next/image";
 import Link from "next/link";
 
 interface Movie {
@@ -21,18 +21,42 @@ export default function Page() {
     (state: RootState) => state.AllMovieSlice.movieAll
   ) as Movie[];
 
-  const [page, setPage] = useState(1);
-  const [searchFilm, setsearchFilm] = useState("");
+  const [page, setPage] = useState(() => {
+    // استرجاع رقم الصفحة من localStorage
+    const savedPage = localStorage.getItem("currentPage");
+    return savedPage ? parseInt(savedPage, 10) : 1; // إذا كان هناك رقم محفوظ، نستخدمه، وإلا نبدأ من 1
+  });
+
+  const [searchFilm, setSearchFilm] = useState("");
+
   useEffect(() => {
+    // استعادة موضع التمرير عند تحميل الصفحة
+    const savedScrollPosition = localStorage.getItem("scrollPosition");
+    if (savedScrollPosition) {
+      window.scrollTo(0, parseInt(savedScrollPosition, 10));
+    } else {
+      window.scrollTo(0, 0);
+    }
+
     dispatch(fetchAllMovie({ page }));
+
+    // حفظ موضع التمرير عند مغادرة الصفحة
+    return () => {
+      localStorage.setItem("scrollPosition", window.scrollY.toString());
+      localStorage.setItem("currentPage", page.toString()); // حفظ رقم الصفحة الحالي
+    };
   }, [dispatch, page]);
 
-  const loadMore = () => {
-    setPage((prevPage) => prevPage + 1);
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchFilm(event.target.value);
   };
 
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setsearchFilm(event.target.value);
+  const totalPages = useSelector(
+    (state: RootState) => state.AllMovieSlice.totalPages
+  );
+
+  const handlePageChange = (pageNumber: number) => {
+    setPage(pageNumber);
   };
 
   return (
@@ -41,43 +65,48 @@ export default function Page() {
         <h1 className="text-4xl text-white mb-4 text-center">Movie</h1>
         <div className="w-full max-w-md mb-4 mx-auto">
           <Label htmlFor="search" className="block mb-2 text-center">
-            Search for a movie:
+            ابحث عن فيلم:
           </Label>
           <TextInput
             id="search"
             type="text"
             onChange={handleSearch}
-            placeholder="Type movie name..."
+            placeholder="اكتب اسم الفيلم..."
             required
             className="mb-2"
           />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 my-3">
-          {
-            allMovie?.filter((el)=> 
+          {allMovie
+            ?.filter((el) =>
               el.title.toLowerCase().includes(searchFilm.toLowerCase())
-            ).map((movie) => (
-            <Link href={`/detials/${movie.id}`}
-              key={movie.id}
-              className="bg-gray-800 p-4 rounded-lg flex flex-col items-center"
-            >
-              <Image
-                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                alt={movie.title}
-                width={500} // تحديد العرض المناسب
-                height={300} // تحديد الطول المناسب
-                className="mb-2 rounded"
-              />
-              <h2 className="text-xl text-white text-center mb-2">
-                {movie.title}
-              </h2>
-            </Link>
-          ))}
+            )
+            .map((movie) => (
+              <Link
+                href={`/detials/${movie.id}`}
+                key={movie.id}
+                className="bg-gray-800 p-4 rounded-lg flex flex-col items-center"
+              >
+                <Image
+                  src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                  alt={movie.title}
+                  width={500}
+                  height={300}
+                  className="mb-2 rounded"
+                />
+                <h2 className="text-xl text-white text-center mb-2">
+                  {movie.title}
+                </h2>
+              </Link>
+            ))}
         </div>
         <div className="flex justify-center mt-4">
-          <Button onClick={loadMore} className="bg-blue-600 text-white my-3">
-            Load More
-          </Button>
+          <Pagination
+            currentPage={page}
+            onPageChange={handlePageChange}
+            totalPages={totalPages}
+            className="my-4"
+          />
         </div>
       </div>
     </div>

@@ -54,7 +54,7 @@ export default function Trending() {
   useEffect(() => {
     dispatch(fetchpopular());
   }, [dispatch]);
-console.log(trending);
+  console.log(trending);
   return (
     <div className="container mt-[50px] mx-auto">
       <div className="flex justify-between items-center mb-3">
@@ -68,7 +68,11 @@ console.log(trending);
       </div>
       <Slider {...settings}>
         {trending?.map((movie) => (
-          <Link href={`/detials/${movie.id}`} key={movie.id} className="relative p-2">
+          <Link
+            href={`/detials/${movie.id}`}
+            key={movie.id}
+            className="relative p-2"
+          >
             <Image
               src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
               alt="error"

@@ -8,7 +8,7 @@ export default function MyNavbar() {
   const pathname = usePathname();
 
   return (
-    <Navbar className="container bg-transparent mx-auto">
+    <Navbar className="fixed top-0 left-0 right-0 bg-black mx-auto z-50">
       <Navbar.Brand as={Link} href="/">
         <span className="self-center whitespace-nowrap text-[40px] text-[#F3F3E0] mr-3">
           Movify
